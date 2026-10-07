@@ -1,42 +1,69 @@
-#include <stdio.h>              // For printf() and scanf()
+#include <stdio.h>
 
 int main()
 {
-    int n;                      // Number of states
-    int eps[10][10];            // ε-transition matrix
-    int closure[10][10] = {0};  // Stores ε-closure
+    int n, e[10][10], a[10][10], b[10][10];
+    int c[10][10] = {0}, na[10][10] = {0}, nb[10][10] = {0};
 
-    printf("Enter number of states: "); // Ask for number of states
-    scanf("%d", &n);                    // Read number of states
+    printf("Enter number of states: ");
+    scanf("%d", &n);
 
-    printf("Enter epsilon transition matrix:\n"); // Ask for matrix
+    printf("Enter epsilon matrix:\n");
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            scanf("%d",&e[i][j]);
 
-    for(int i = 0; i < n; i++)          // Loop through rows
-        for(int j = 0; j < n; j++)      // Loop through columns
-            scanf("%d", &eps[i][j]);    // Read each transition
+    printf("Enter 'a' transition matrix:\n");
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            scanf("%d",&a[i][j]);
 
-    // Find ε-closure
-    for(int i = 0; i < n; i++)          // For every state
+    printf("Enter 'b' transition matrix:\n");
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            scanf("%d",&b[i][j]);
+
+    // Find epsilon closure
+    for(int i=0;i<n;i++)
     {
-        closure[i][i] = 1;              // A state is always in its own closure
+        c[i][i]=1;
 
-        for(int j = 0; j < n; j++)      // Check all states
-            if(eps[i][j] == 1)          // If ε-transition exists
-                closure[i][j] = 1;      // Add that state to closure
+        for(int j=0;j<n;j++)
+            if(e[i][j])
+                c[i][j]=1;
     }
 
-    printf("\nEpsilon Closure:\n");      // Print heading
+    // Create NFA transitions for a and b
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            if(c[i][j])
+            {
+                for(int k=0;k<n;k++)
+                {
+                    if(a[j][k])
+                        na[i][k]=1;
 
-    for(int i = 0; i < n; i++)          // For every state
+                    if(b[j][k])
+                        nb[i][k]=1;
+                }
+            }
+
+    printf("\nNFA without epsilon:\n");
+
+    for(int i=0;i<n;i++)
     {
-        printf("State %d: ", i);        // Print current state
+        printf("q%d --a--> ",i);
+        for(int j=0;j<n;j++)
+            if(na[i][j])
+                printf("q%d ",j);
 
-        for(int j = 0; j < n; j++)      // Check all states
-            if(closure[i][j])           // If state is in closure
-                printf("%d ", j);       // Print that state
+        printf("\nq%d --b--> ",i);
+        for(int j=0;j<n;j++)
+            if(nb[i][j])
+                printf("q%d ",j);
 
-        printf("\n");                   // Move to next line
+        printf("\n");
     }
 
-    return 0;                           // End program
+    return 0;
 }
